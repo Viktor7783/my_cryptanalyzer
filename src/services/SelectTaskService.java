@@ -29,7 +29,7 @@ public class SelectTaskService {
         if (taskNumber == 5) {
             System.out.println("GAME OVER!");
             System.exit(0);
-        } else if (languageNumber < 1 || languageNumber > 5) {
+        } else if (taskNumber < 1 || taskNumber > 5) {
             try {
                 throw new WrongNumberException("Введите число от 1 до 5");
             } catch (WrongNumberException e) {

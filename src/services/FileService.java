@@ -79,13 +79,12 @@ public class FileService {
         return readList;
     }
 
-    public void writeToFile(List<String> list) {
-        for (String string : list) {
-            try {
-                Files.writeString(destinationPath, string);
-            } catch (IOException e) {
-                System.out.println("Не удалось записать текст в файл " + destinationPath.getFileName());
-            }
+    public void writeToFile(String text) {
+        try {
+            Files.writeString(destinationPath, text);
+        } catch (IOException e) {
+            System.out.println("Не удалось записать текст в файл " + destinationPath.getFileName());
+            System.exit(0);
         }
     }
 }
