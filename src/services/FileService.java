@@ -1,89 +1,46 @@
 package services;
 
 import exceptions.SmallFileException;
-import exceptions.WrongFileException;
+
+import static constants.Constants.*;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileService {
-    private Path sourcePath;
-    private Path examplePath;
-    private Path destinationPath;
+    private FileValidationService fileValidationService;
 
-
-    public Path getSourcePath() {
-        return sourcePath;
+    public FileService(FileValidationService fileValidationService) {
+        this.fileValidationService = fileValidationService;
     }
 
-    public Path getExamplePath() {
-        return examplePath;
-    }
-
-    public Path getDestinationPath() {
-        return destinationPath;
-    }
-
-    public void createPaths(String stringSource, String stringDestination) {
-        sourcePath = Path.of(stringSource);
-        if (Files.notExists(sourcePath)) {
-            try {
-                throw new WrongFileException("ОШИБКА: файла - источника с именем " + stringSource + " не существует!");
-            } catch (WrongFileException e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
-            }
-        }
-        destinationPath = Path.of(stringDestination);
-        if (destinationPath.endsWith(Path.of(".bash_profile")) || destinationPath.endsWith(Path.of("hosts"))) {
-            try {
-                throw new WrongFileException("Воу-воу-воу, полегче, мамкин хацкер! Файл " + stringDestination + "изменять нельзя!!!");
-            } catch (WrongFileException e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
-            }
-        }
-
-    }
-
-    public void createPaths(String stringSource, String example, String stringDestination) {
-        this.createPaths(stringSource, stringDestination);
-        examplePath = Path.of(example);
-        if (Files.notExists(examplePath)) {
-            try {
-                throw new WrongFileException("ОШИБКА: файла - примера с именем " + example + " не существует!");
-            } catch (WrongFileException e) {
-                System.out.println(e.getMessage());
-                System.exit(0);
-            }
-        }
-    }
-
-    public ArrayList<String> readFromFile(Path path) {
+    public List<String> readFromFile(String stringPath, boolean needToCheckFileSize) {
+        Path sourcePath = Path.of(stringPath);
+        fileValidationService.fileExistTest(sourcePath);
         ArrayList<String> readList = null;
         try {
-            readList = new ArrayList<>(Files.readAllLines(path));
-            if (path.equals(sourcePath) && readList.isEmpty()) {
-                throw new SmallFileException("Файл " + path.getFileName() + " пустой!");
-            } else if (path.equals(examplePath) && readList.size() < 5) {
-                throw new SmallFileException("Файл " + path.getFileName() + " слишком маленький для анализа!");
-            }
+            readList = new ArrayList<>(Files.readAllLines(sourcePath));
+            if (needToCheckFileSize) fileValidationService.SmallFileTest(sourcePath, readList);
         } catch (IOException | SmallFileException e) {
-            String message = e instanceof SmallFileException ? e.getMessage() : "Не удалось прочитать файл " + path.getFileName();
+            String message = e instanceof SmallFileException ? e.getMessage() : READ_FILE_ERROR + sourcePath.getFileName();
             System.out.println(message);
             System.exit(0);
         }
         return readList;
     }
 
-    public void writeToFile(String text) {
+    public void writeToFile(String stringDestinationPath, List<String> cryptoList) {
+        Path destinationPath = Path.of(stringDestinationPath);
+        fileValidationService.wrongFileTest(destinationPath);
         try {
-            Files.writeString(destinationPath, text);
+            for (String textLine : cryptoList)
+                Files.writeString(destinationPath, textLine, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
         } catch (IOException e) {
-            System.out.println("Не удалось записать текст в файл " + destinationPath.getFileName());
+            System.out.println(WRITE_FILE_ERROR + destinationPath.getFileName());
             System.exit(0);
         }
     }
