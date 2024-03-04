@@ -9,7 +9,7 @@ import java.util.*;
 import static constants.Constants.*;
 
 public class CryptoModel {
-    private FileService fileService;
+    private final FileService fileService;
 
     public CryptoModel(FileService fileService) {
         this.fileService = fileService;
@@ -31,60 +31,84 @@ public class CryptoModel {
         boolean isDecrypt = false;
         List<String> sourceList = fileService.readFromFile(source, true);
         List<String> exampleList = fileService.readFromFile(example, true);
-        Map<String, Integer> exampleMaxValueMap = getSourceMaxValueMap(exampleList);
-        if (isSuccessDecryptAndWrite(sourceList, exampleMaxValueMap, destination)) return;
-        int key = 1;
-        for (int i = 0; i < ALPHABET_RUS_ENG_REVERSE.size(); i++) {
-            if (isSuccessDecryptAndWrite(cryptoCore(sourceList, key, ALPHABET_RUS_ENG_REVERSE), exampleMaxValueMap, destination)) {
+        List<String> exampleMaxValueList = getSourceMaxValueList(exampleList);
+        List<String> cryptoSourceList = new ArrayList<>();
+
+        for (int i = 0, key = 0; i < ALPHABET_RUS_ENG_REVERSE.size(); i++, key++) {
+            List<String> cryptoMaxValueList = getSourceMaxValueList(cryptoSourceList = cryptoCore(sourceList, key, ALPHABET_RUS_ENG_REVERSE));
+            if (new HashSet<>(exampleMaxValueList).containsAll(cryptoMaxValueList)) {
                 isDecrypt = true;
                 break;
             }
-            ++key;
         }
-        if (!isDecrypt) try {
-            throw new DecryptionException(String.format(DECRYPT_ERROR_MESSAGE, Path.of(source)));
-        } catch (DecryptionException e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
+        if (isDecrypt) fileService.writeToFile(destination, cryptoSourceList);
+        else {
+            try {
+                throw new DecryptionException(String.format(DECRYPT_ERROR_MESSAGE, Path.of(source).getFileName()));
+            } catch (DecryptionException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
         }
     }
 
-    private boolean isSuccessDecryptAndWrite(List<String> cryptoList, Map<String, Integer> exampleMaxValueMap, String destination) {
-        Map<String, Integer> cryptoMaxValueMap = getSourceMaxValueMap(cryptoList);
-        int count = 0;
-        for (Map.Entry<String, Integer> examplePair : exampleMaxValueMap.entrySet()) {
-            if (cryptoMaxValueMap.containsKey(examplePair.getKey())) ++count;
+
+    public void statisticalDecrypt(String source, String example, String destination) {
+        boolean isDecrypt = false;
+        List<String> sourceList = fileService.readFromFile(source, true);
+        List<String> exampleList = fileService.readFromFile(example, true);
+
+        List<String> sourceMaxList = getSourceMaxValueList(sourceList);
+        List<String> exampleMaxList = getSourceMaxValueList(exampleList);
+        int key = 0;
+        for (int x = 0; x < ALPHABET_RUS_ENG_REVERSE.size(); x++, key++) {
+            List<String> cryptoMaxList = cryptoCore(sourceMaxList, key, ALPHABET_RUS_ENG_REVERSE);
+            if (new HashSet<>(exampleMaxList).containsAll(cryptoMaxList)) {
+                isDecrypt = true;
+                break;
+            }
         }
-        if (count > 1) {
-            fileService.writeToFile(destination, cryptoList);
-            return true;
+        if (isDecrypt) fileService.writeToFile(destination, cryptoCore(sourceList, key, ALPHABET_RUS_ENG_REVERSE));
+        else {
+            try {
+                throw new DecryptionException(String.format(DECRYPT_ERROR_MESSAGE, Path.of(source).getFileName()));
+            } catch (DecryptionException e) {
+                System.out.println(e.getMessage());
+                System.exit(0);
+            }
         }
-        return false;
     }
 
-    private static Map<String, Integer> getSourceMaxValueMap(List<String> sourceList) {
+    private static List<String> getSourceMaxValueList(List<String> sourceList) {
         Map<String, Integer> sourceWordsMap = new HashMap<>();
-        Map<String, Integer> sourceMaxValueMap = new HashMap<>();
+        List<String> sourceMaxValueList = new ArrayList<>();
+
         for (String textLine : sourceList) {
             String[] wordsArray = textLine.split(" ");
             for (String word : wordsArray) {
-                Integer valueMap = sourceWordsMap.get(word.toLowerCase());
-                sourceWordsMap.put(word.toLowerCase(), valueMap == null ? 1 : valueMap + 1);
+                boolean isAlphabetWord = true;
+                for (char c : word.toCharArray()) {
+                    if (!ALPHABET_RUS_ENG_REVERSE.contains(c)) {
+                        isAlphabetWord = false;
+                        break;
+                    }
+                }
+                if (isAlphabetWord) {
+                    Integer valueMap = sourceWordsMap.get(word.toLowerCase());
+                    sourceWordsMap.put(word.toLowerCase(), valueMap == null ? 1 : valueMap + 1);
+                }
+
             }
         }
 
         Comparator<Map.Entry<String, Integer>> comparator = Map.Entry.comparingByValue();
-        Set<Map.Entry<String, Integer>> set = sourceWordsMap.entrySet();
+        Set<Map.Entry<String, Integer>> set = new HashSet<>(sourceWordsMap.entrySet());
         for (int i = 0; i < 3; i++) {
             Map.Entry<String, Integer> maxEntry = Collections.max(set, comparator);
-            sourceMaxValueMap.put(maxEntry.getKey(), maxEntry.getValue());
+            sourceMaxValueList.add(maxEntry.getKey());
             set.remove(maxEntry);
         }
-        return sourceMaxValueMap;
-    }
-
-    public void statisticalDecrypt() {
-
+        return sourceMaxValueList;
     }
 
     private List<String> cryptoCore(List<String> sourceList, int key, List<Character> alphabet) {
@@ -108,7 +132,6 @@ public class CryptoModel {
                     stringBuilder.append(isUppercase ? Character.toUpperCase(newChar) : newChar);
                 } else stringBuilder.append(textLine.charAt(x));
             }
-            stringBuilder.append('\n');
             crypotList.add(stringBuilder.toString());
             stringBuilder.delete(0, stringBuilder.length());
         }

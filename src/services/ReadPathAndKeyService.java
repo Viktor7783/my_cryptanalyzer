@@ -6,9 +6,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 import static constants.Constants.*;
+import static constants.CryptoTask.*;
 
 public class ReadPathAndKeyService {
-    private BufferedReader reader;
+    private final BufferedReader reader;
     private String source;
     private String destination;
     private String example;
@@ -49,7 +50,12 @@ public class ReadPathAndKeyService {
     }
 
     public void readPathForExampleDecrypt() {
-        readPathFor(CryptoTask.DECRYPT);
+        System.out.println(DECRYPT.getSourceMessage());
+        source = consoleReader();
+        exitTest(source);
+        System.out.println(DECRYPT.getDestinationMessage());
+        destination = consoleReader();
+        exitTest(destination);
         System.out.println(EXAMPLE_SOURCE_MESSAGE);
         example = consoleReader();
         exitTest(example);

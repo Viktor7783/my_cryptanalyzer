@@ -9,18 +9,16 @@ import java.io.InputStreamReader;
 import static constants.Constants.*;
 
 public class CryptoService {
-    private BufferedReader reader;
-    private SelectTaskService selectTaskService;
-    private FileService fileService;
-    private CryptoModel cryptoModel;
-    private ReadPathAndKeyService readPathAndKeyService;
-    private FileValidationService fileValidationService;
+    private final BufferedReader reader;
+    private final SelectTaskService selectTaskService;
+    private final CryptoModel cryptoModel;
+    private final ReadPathAndKeyService readPathAndKeyService;
 
     public CryptoService() {
         reader = new BufferedReader(new InputStreamReader(System.in));
         selectTaskService = new SelectTaskService(reader);
-        fileValidationService = new FileValidationService();
-        fileService = new FileService(fileValidationService);
+        FileValidationService fileValidationService = new FileValidationService();
+        FileService fileService = new FileService(fileValidationService);
         cryptoModel = new CryptoModel(fileService);
         readPathAndKeyService = new ReadPathAndKeyService(reader);
     }
@@ -38,7 +36,7 @@ public class CryptoService {
             cryptoModel.bruteForceDecrypt(readPathAndKeyService.getSource(), readPathAndKeyService.getExample(), readPathAndKeyService.getDestination());
         } else if (selectTaskService.getTaskNumber() == 4) {
             readPathAndKeyService.readPathForExampleDecrypt();
-            //Вызов Cryptomodel
+            cryptoModel.statisticalDecrypt(readPathAndKeyService.getSource(), readPathAndKeyService.getExample(), readPathAndKeyService.getDestination());
         }
 
         try {

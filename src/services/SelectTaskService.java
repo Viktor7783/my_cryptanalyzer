@@ -8,7 +8,7 @@ import java.io.IOException;
 import static constants.Constants.*;
 
 public class SelectTaskService {
-    private BufferedReader reader;
+    private final BufferedReader reader;
     private int taskNumber;
 
     public SelectTaskService(BufferedReader reader) {

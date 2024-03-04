@@ -77,7 +77,6 @@ public class Constants {
             ======================================================================
             """;
 
-    public static final String LANGUAGE_NUMBER_ERROR = "Ошибка: неверное число для выбора языка!\nВведите число:\n 1 - Русский\n2 - Английский";
     public static final String KEY_NUMBER_ERROR = "Ошибка: Ключ не должен быть меньше нуля!";
     public static final String CHANGE_FILE_ERROR = "Воу-воу-воу, полегче, мамкин хацкер! Файл %s изменять нельзя!!!";
     public static final String TOO_SMALL_FILE_ERROR = "Файл %s слишком маленький для анализа!";
@@ -90,6 +89,7 @@ public class Constants {
     public static final String READ_FILE_ERROR = "Не удалось прочитать файл ";
     public static final String WRITE_FILE_ERROR = "Не удалось записать текст в файл ";
     public static final String DECRYPT_ERROR_MESSAGE = "Ошибка: не удалось расшифровать файл %s. Попробуйте заменить файл с примером текста.";
+    public static final String WRONG_FORMAT_ERROR_MESSAGE = "Ошибка: файл %s должен быть в формате .txt";
 
 
     public static final String GAME_OVER = """

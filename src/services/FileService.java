@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileService {
-    private FileValidationService fileValidationService;
+    private final FileValidationService fileValidationService;
 
     public FileService(FileValidationService fileValidationService) {
         this.fileValidationService = fileValidationService;
@@ -20,6 +20,7 @@ public class FileService {
 
     public List<String> readFromFile(String stringPath, boolean needToCheckFileSize) {
         Path sourcePath = Path.of(stringPath);
+        fileValidationService.txtFileTest(sourcePath);
         fileValidationService.fileExistTest(sourcePath);
         ArrayList<String> readList = null;
         try {
@@ -35,10 +36,11 @@ public class FileService {
 
     public void writeToFile(String stringDestinationPath, List<String> cryptoList) {
         Path destinationPath = Path.of(stringDestinationPath);
+        fileValidationService.txtFileTest(destinationPath);
         fileValidationService.wrongFileTest(destinationPath);
         try {
             for (String textLine : cryptoList)
-                Files.writeString(destinationPath, textLine, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
+                Files.writeString(destinationPath, textLine + '\n', StandardOpenOption.APPEND, StandardOpenOption.CREATE);
         } catch (IOException e) {
             System.out.println(WRITE_FILE_ERROR + destinationPath.getFileName());
             System.exit(0);
