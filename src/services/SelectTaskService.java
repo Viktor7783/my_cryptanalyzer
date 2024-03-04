@@ -16,6 +16,7 @@ public class SelectTaskService {
     }
 
     public void selectTask() {
+        System.out.println(WELCOME);
         System.out.println(CHOOSE_A_TASK);
         taskNumber = consoleReader();
         numberTest(taskNumber);

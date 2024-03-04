@@ -23,6 +23,7 @@ public class Constants {
     public static final List<String> UNAVAILABLE_PATHS_FOR_LINUX = List.of("bash_profile", "hosts", "/etc/", "/boot/", "/dev/", "/lib/", "/lib64/", "/opt/", "/proc/", "/root/", "/run/", "/sbin/", "/swap/", "/sys/", "/tmp/", "/usr/", "/var/", "/bin/");
     public static final List<String> UNAVAILABLE_PATHS_FOR_MAC_OS = List.of("System", "Applications", "Library");
 
+    public static final String WELCOME = "ДОБРО ПОЖАЛОВАТЬ!";
     public static final String CHOOSE_A_TASK = """
             ======================================================================
             Выберите тип задачи:
