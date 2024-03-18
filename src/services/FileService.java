@@ -25,7 +25,7 @@ public class FileService {
         ArrayList<String> readList = null;
         try {
             readList = new ArrayList<>(Files.readAllLines(sourcePath));
-            if (needToCheckFileSize) fileValidationService.SmallFileTest(sourcePath, readList);
+            if (needToCheckFileSize) fileValidationService.smallFileTest(sourcePath, readList);
         } catch (IOException | SmallFileException e) {
             String message = e instanceof SmallFileException ? e.getMessage() : READ_FILE_ERROR + sourcePath.getFileName();
             System.out.println(message);

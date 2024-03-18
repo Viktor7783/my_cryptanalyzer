@@ -12,7 +12,7 @@ import static constants.Constants.*;
 public class FileValidationService {
 
     public void txtFileTest(Path path) {
-        if (!path.getFileName().toString().endsWith(".txt")) {
+        if (!path.getFileName().toString().endsWith(TXT)) {
             try {
                 throw new WrongFileException(String.format(WRONG_FORMAT_ERROR_MESSAGE, path.getFileName()));
             } catch (WrongFileException e) {
@@ -33,7 +33,7 @@ public class FileValidationService {
         }
     }
 
-    public void SmallFileTest(Path path, List<String> stringList) throws SmallFileException {
+    public void smallFileTest(Path path, List<String> stringList) throws SmallFileException {
         if (stringList.isEmpty()) throw new SmallFileException(String.format(EMPTY_FILE_ERROR, path.getFileName()));
         long size = 0;
         for (String stringLine : stringList) {

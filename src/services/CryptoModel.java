@@ -16,32 +16,32 @@ public class CryptoModel {
     }
 
     public void encrypt(String source, String destination, int key) {
-        List<String> sourceList = fileService.readFromFile(source, false);
-        List<String> cryptoList = cryptoCore(sourceList, key, ALPHABET_RUS_ENG);
-        fileService.writeToFile(destination, cryptoList);
+        List<String> sources = fileService.readFromFile(source, false);
+        List<String> crypto = cryptoCore(sources, key, ALPHABET_RUS_ENG);
+        fileService.writeToFile(destination, crypto);
     }
 
     public void decrypt(String source, String destination, int key) {
-        List<String> sourceList = fileService.readFromFile(source, false);
-        List<String> cryptoList = cryptoCore(sourceList, key, ALPHABET_RUS_ENG_REVERSE);
-        fileService.writeToFile(destination, cryptoList);
+        List<String> sources = fileService.readFromFile(source, false);
+        List<String> crypto = cryptoCore(sources, key, ALPHABET_RUS_ENG_REVERSE);
+        fileService.writeToFile(destination, crypto);
     }
 
     public void bruteForceDecrypt(String source, String example, String destination) {
         boolean isDecrypt = false;
-        List<String> sourceList = fileService.readFromFile(source, true);
-        List<String> exampleList = fileService.readFromFile(example, true);
-        List<String> exampleMaxValueList = getSourceMaxValueList(exampleList);
-        List<String> cryptoSourceList = new ArrayList<>();
+        List<String> sources = fileService.readFromFile(source, true);
+        List<String> examples = fileService.readFromFile(example, true);
+        List<String> exampleMaxValue = getSourceMaxValueList(examples);
+        List<String> cryptoSource = new ArrayList<>();
 
         for (int i = 0, key = 0; i < ALPHABET_RUS_ENG_REVERSE.size(); i++, key++) {
-            List<String> cryptoMaxValueList = getSourceMaxValueList(cryptoSourceList = cryptoCore(sourceList, key, ALPHABET_RUS_ENG_REVERSE));
-            if (new HashSet<>(exampleMaxValueList).containsAll(cryptoMaxValueList)) {
+            List<String> cryptoMaxValueList = getSourceMaxValueList(cryptoSource = cryptoCore(sources, key, ALPHABET_RUS_ENG_REVERSE));
+            if (new HashSet<>(exampleMaxValue).containsAll(cryptoMaxValueList)) {
                 isDecrypt = true;
                 break;
             }
         }
-        if (isDecrypt) fileService.writeToFile(destination, cryptoSourceList);
+        if (isDecrypt) fileService.writeToFile(destination, cryptoSource);
         else {
             try {
                 throw new DecryptionException(String.format(DECRYPT_ERROR_MESSAGE, Path.of(source).getFileName()));
@@ -79,7 +79,7 @@ public class CryptoModel {
         }
     }
 
-    private static List<String> getSourceMaxValueList(List<String> sourceList) {
+    private List<String> getSourceMaxValueList(List<String> sourceList) {
         Map<String, Integer> sourceWordsMap = new HashMap<>();
         List<String> sourceMaxValueList = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class CryptoModel {
                 }
                 if (isAlphabetWord) {
                     Integer valueMap = sourceWordsMap.get(word.toLowerCase());
-                    sourceWordsMap.put(word.toLowerCase(), valueMap == null ? 1 : valueMap + 1);
+                    sourceWordsMap.put(word.toLowerCase(), valueMap == null ? INCREMENT_VALUE : valueMap + INCREMENT_VALUE);
                 }
 
             }
@@ -103,7 +103,7 @@ public class CryptoModel {
 
         Comparator<Map.Entry<String, Integer>> comparator = Map.Entry.comparingByValue();
         Set<Map.Entry<String, Integer>> set = new HashSet<>(sourceWordsMap.entrySet());
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < THREE_WORDS; i++) {
             Map.Entry<String, Integer> maxEntry = Collections.max(set, comparator);
             sourceMaxValueList.add(maxEntry.getKey());
             set.remove(maxEntry);

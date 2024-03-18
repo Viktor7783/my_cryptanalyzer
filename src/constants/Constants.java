@@ -18,7 +18,9 @@ public class Constants {
         ALPHABET_RUS_ENG_REVERSE = tempList;
     }
 
-
+    public static final int INCREMENT_VALUE = 1;
+    public static final int THREE_WORDS = 3;
+    public static final String TXT = ".txt";
     public static final List<String> UNAVAILABLE_PATHS_FOR_WINDOWS = List.of("System32", "SysWOW64", "AppData", "ProgramData", "Program Files");
     public static final List<String> UNAVAILABLE_PATHS_FOR_LINUX = List.of("bash_profile", "hosts", "/etc/", "/boot/", "/dev/", "/lib/", "/lib64/", "/opt/", "/proc/", "/root/", "/run/", "/sbin/", "/swap/", "/sys/", "/tmp/", "/usr/", "/var/", "/bin/");
     public static final List<String> UNAVAILABLE_PATHS_FOR_MAC_OS = List.of("System", "Applications", "Library");
